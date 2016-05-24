@@ -315,18 +315,21 @@ class TDL(object):
             # a sensible default
             return None
 
-        match = re.match(r'([0-9]*) *([GT]?)$', size)
+        # Rock: Support M
+        match = re.match(r'([0-9]*) *([GMT]?)$', size)
         if not match or len(match.groups()) != 2:
-            raise oz.OzException.OzException("Invalid disk size; it must be specified as a size in gigabytes, optionally suffixed with 'G' or 'T'")
+            raise oz.OzException.OzException("Invalid disk size; it must be specified as a size in gigabytes, optionally suffixed with 'G', 'T' or 'M'")
 
         number = match.group(1)
         suffix = match.group(2)
 
         if not suffix or suffix == 'G':
             # for backwards compatibility, we assume G when there is no suffix
-            size = number
-        elif suffix == 'T':
             size = str(int(number) * 1024)
+        elif suffix == 'T':
+            size = str(int(number) * 1024 * 1024)
+        elif suffix == 'M':
+            size = str(int(number))
 
         return size
 

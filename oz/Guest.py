@@ -281,7 +281,9 @@ class Guest(object):
 
         self.disksize = 10
         if self.tdl.disksize is not None:
+            # FIXME: Rock: int
             self.disksize = int(self.tdl.disksize)
+            #self.disksize = self.tdl.disksize
 
         self.auto = auto
         if self.auto is None:
@@ -512,7 +514,8 @@ class Guest(object):
         bootDisk = self.lxml_subelement(devices, "disk", None, {'device':'disk', 'type':'file'})
         self.lxml_subelement(bootDisk, "target", None, {'dev':self.disk_dev, 'bus':self.disk_bus})
         self.lxml_subelement(bootDisk, "source", None, {'file':self.diskimage})
-        self.lxml_subelement(bootDisk, "driver", None, {'name':'qemu', 'type':self.image_type})
+        # Rock: writeback
+        self.lxml_subelement(bootDisk, "driver", None, {'name':'qemu', 'type':self.image_type, 'cache':'writeback'})
         # install disk (if any)
         if not installdev:
             installdev_list = []
@@ -546,7 +549,8 @@ class Guest(object):
             # we'll copy the JEOS itself later on
             return
 
-        self.log.info("Generating %dGB diskimage for %s", size, self.tdl.name)
+        # Rock:
+        self.log.info("Generating %sMB diskimage for %s", size, self.tdl.name)
 
         diskimage = self.diskimage
         if image_filename:
@@ -597,7 +601,8 @@ class Guest(object):
             self.lxml_subelement(backing, "format", None,
                                  {"type":backing_format})
 
-        self.lxml_subelement(vol, "capacity", str(capacity), {'unit':'G'})
+        # Rock
+        self.lxml_subelement(vol, "capacity", str(capacity), {'unit':'M'})
         vol_xml = lxml.etree.tostring(vol, pretty_print=True)
 
         # sigh.  Yes, this is racy; if a pool is defined during this loop, we
